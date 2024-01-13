@@ -1,0 +1,149 @@
+from pygame import *
+window=display.set_mode((1280, 800))
+display.set_caption("Доганялки")
+background=transform.scale(image.load("1.jpg"), (1280, 800))
+lose=transform.scale(image.load("image (2).png"), (1280,800))
+win=transform.scale(image.load("channels4_profile (1).jpg"),(1280,800))
+x1, y1=50, 600
+x2, y2=570, 400
+x3, y3=730, 250
+x4, y4=450, 50
+class GameSprite(sprite.Sprite):
+    def __init__(self, player_image, player_x, player_y, player_speed):
+        super().__init__()
+        self.image=transform.scale(image.load(player_image), (100,100))
+        self.speed=player_speed
+        self.rect=self.image.get_rect()
+        self.rect.x=player_x
+        self.rect.y=player_y
+
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+class Player(GameSprite):
+    def update(self):
+        keys_pressed=key.get_pressed()
+        if keys_pressed[K_UP] and self.rect.y>5:
+            self.rect.y-=self.speed
+        if keys_pressed[K_DOWN] and self.rect.y<700:
+            self.rect.y+=self.speed
+        if keys_pressed[K_LEFT] and self.rect.x>5:
+            self.rect.x-=self.speed
+        if keys_pressed[K_RIGHT] and self.rect.x<1195: 
+            self.rect.x+=self.speed
+
+class Enemy(GameSprite):
+    direction="right"
+    def update(self):
+        if self.rect.x >=900:
+            self.direction="left"
+        if self.rect.x <=570:
+            self.direction="right"
+        
+        if self.direction=="right":
+            self.rect.x+=self.speed
+        else:
+            self.rect.x-=self.speed
+class Enemy1(GameSprite):
+    direction="right"
+    def update(self):
+        if self.rect.x >=1500:
+            self.direction="left"
+        if self.rect.x <=450:
+            self.direction="right"
+        
+        if self.direction=="right":
+            self.rect.x+=self.speed
+        else:
+            self.rect.x-=self.speed
+
+
+class Wall(sprite.Sprite):
+    def __init__(self, color_1, color_2, color_3, wall_x, wall_y, wall_width, wall_height):
+        super().__init__()
+        self.color_1 = color_1
+        self.color_2 = color_2
+        self.color_3 = color_3
+        self.width = wall_width
+        self.height = wall_height
+
+        # картинка стіни - прямокутник потрібних розмірів і кольору
+        self.image = Surface([self.width, self.height])
+        self.image.fill((color_1, color_2, color_3))
+
+        # кожен спрайт має зберігати властивість rect - прямокутник
+        self.rect = self.image.get_rect()
+        self.rect.x = wall_x
+        self.rect.y = wall_y
+
+    def draw_wall(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+# sprite1=transform.scale(image.load('31d45eea8d6fda7bfa69e4849a389a52__1_-removebg-preview.png'), (100,100))
+# sprite2=transform.scale(image.load('images__1_-removebg-preview.png'), (100,100))
+# sprite3=transform.scale(image.load("4-2-removebg-preview.png"), (100, 100))
+sprite1=Player('31d45eea8d6fda7bfa69e4849a389a52__1_-removebg-preview.png', x1, y1, 4)
+sprite2=Enemy('images__1_-removebg-preview.png', x2,y2,2)
+sprite3=GameSprite("4-2-removebg-preview.png", x3,y3,0)
+sprite4=Enemy1("Hippo.png", x4,y4,2)
+w1 = Wall(255, 153, 51, 100, 20, 1075, 10)
+w2 = Wall(255, 153, 51, 100, 770, 1075, 10)
+w3 = Wall(255, 153, 51, 100, 20, 10, 550)
+w4 = Wall(255, 153, 51, 250, 160, 10, 620)
+w5 = Wall(255, 153, 51, 400, 30, 10, 620)
+w6 = Wall(255, 153, 51, 550, 160, 10, 620)
+w7 = Wall(255, 153, 51, 550, 160, 475, 10)
+w8 = Wall(255, 153, 51, 1165, 160, 10, 620)
+w9 = Wall(255, 153, 51, 1015, 160, 10, 485)
+w10 = Wall(255, 153, 51, 725, 635, 300, 10)
+
+clock=time.Clock()
+FPS=60
+
+mixer.init()
+sound=mixer.Sound("creepy-and-simple-horror-background-music-made-with-Voicemod-technology.mp3")
+sound.play()    
+
+scream=mixer.Sound("scream.mp3")
+eating_sound=mixer.Sound("eating_sound.mp3")
+finish=False
+game=True
+while game:
+    for e in event.get():
+        if e.type==QUIT:
+            game=False
+    if finish!=True:
+        window.blit(background,(0,0))
+        sprite1.update()
+        sprite2.update()
+        sprite4.update()
+
+        sprite1.reset()
+        sprite2.reset()
+        sprite3.reset()
+        sprite4.reset()
+
+    w1.draw_wall()
+    w2.draw_wall()
+    w3.draw_wall()
+    w4.draw_wall()
+    w5.draw_wall()
+    w6.draw_wall()
+    w7.draw_wall()
+    w8.draw_wall()
+    w9.draw_wall()
+    w10.draw_wall()
+
+    if sprite.collide_rect(sprite1, sprite2) or sprite.collide_rect(sprite1, sprite4) or sprite.collide_rect(sprite1, w1) or sprite.collide_rect(sprite1, w2) or sprite.collide_rect(sprite1, w3) or sprite.collide_rect(sprite1, w4) or sprite.collide_rect(sprite1, w5) or sprite.collide_rect(sprite1, w6) or sprite.collide_rect(sprite1, w7) or sprite.collide_rect(sprite1, w8) or sprite.collide_rect(sprite1, w9) or sprite.collide_rect(sprite1, w10):
+        finish=True
+        window.blit(lose,(0,0))
+        sound.stop()
+        scream.set_volume(0.3)
+        scream.play(7)
+    if sprite.collide_rect(sprite1, sprite3):
+        finish=True
+        window.blit(win,(0,0))
+        sound.stop()
+        eating_sound.play()
+    clock.tick(FPS)
+    display.update()
